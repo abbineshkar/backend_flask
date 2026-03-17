@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  backend-flask:
+    image: aqaziuog/lms-backend:2.0.0
+    pull_policy: always
+    ports:
+      - "4000:4000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge

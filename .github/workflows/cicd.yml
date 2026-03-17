@@ -2,7 +2,7 @@ name: Backend CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main ]
 
 env:
   DOCKER_BACKEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/lms-backend
@@ -43,7 +43,7 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code

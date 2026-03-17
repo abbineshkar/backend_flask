@@ -13,22 +13,22 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to DockerHub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push backend image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./backend-flask
           platforms: linux/amd64,linux/arm64
@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create SSH key
         run: |
@@ -58,14 +58,14 @@ jobs:
 
       - name: Copy backend docker-compose file
         run: |
-          scp docker-compose.backend.yml \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/docker-compose.backend.yml
+          scp backend-compose.yml \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/backend-compose.yml
 
       - name: Deploy backend
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} '
-            docker-compose -f docker-compose.backend.yml down
+            docker-compose -f backend-compose.yml down
             docker system prune -af
-            docker-compose -f docker-compose.backend.yml pull
-            docker-compose -f docker-compose.backend.yml up -d --force-recreate
+            docker-compose -f backend-compose.yml pull
+            docker-compose -f backend-compose.yml up -d --force-recreate
           '

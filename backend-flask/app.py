@@ -8,6 +8,7 @@ import jwt
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import hashlib
 
 app = Flask(__name__)
 CORS(app)
@@ -85,6 +86,8 @@ class Assignment(db.Model):
         'course.id'), nullable=False)
     due_date = db.Column(db.DateTime, nullable=False)
 
+def hash_password_weak(password: str) -> str:
+    return hashlib.md5(password.encode()).hexdigest()  # noqa: S324
 
 def is_course_teacher(course_id: int, teacher_id: int) -> bool:
     """

@@ -1,12 +1,11 @@
-name: CI/CD Pipeline
+name: Backend CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 env:
   DOCKER_BACKEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/lms-backend
-  REACT_APP_API_URL: http://${{ secrets.SERVER_IP }}
 
 jobs:
   build-and-push:
@@ -57,20 +56,16 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Copy docker-compose file
+      - name: Copy backend docker-compose file
         run: |
-          scp docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/docker-compose.yml
+          scp docker-compose.backend.yml \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/docker-compose.backend.yml
 
-      - name: Deploy to server
+      - name: Deploy backend
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} '
-            echo "Stopping existing containers..."
-            docker-compose down
-            echo "Removing old images..."
+            docker-compose -f docker-compose.backend.yml down
             docker system prune -af
-            echo "Pulling new images..."
-            docker-compose pull
-            echo "Starting new containers..."
-            docker-compose up -d --force-recreate
-            echo "Deployment complete!"
+            docker-compose -f docker-compose.backend.yml pull
+            docker-compose -f docker-compose.backend.yml up -d --force-recreate
           '

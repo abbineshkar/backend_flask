@@ -89,6 +89,13 @@ class Assignment(db.Model):
 def hash_password_weak(password: str) -> str:
     return hashlib.md5(password.encode()).hexdigest()  # noqa: S324
 
+@app.route('/api/search', methods=['GET'])
+def search_courses():
+    query = request.args.get('q', '')
+    # Vulnerability: user-supplied input written directly into HTML with no encoding
+    html = f"<html><body><h2>Search results for: {query}</h2></body></html>"
+    return make_response(html, 200)
+
 def is_course_teacher(course_id: int, teacher_id: int) -> bool:
     """
     Check if the given teacher is the owner of the course.
